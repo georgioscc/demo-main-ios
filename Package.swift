@@ -3,7 +3,7 @@ import PackageDescription
 import Foundation
 
 // NOTE: swap "georgioscc" for your actual GitHub username/org if different.
-let version: Version = "0.1.1"
+let version: Version = "0.1.2"
 let coreChecksum = "d30dd74f21017d0e536e64cc540fd4fd7a549d3643f30670b3029c1829b6ba90"
 let uiChecksum = "5444f3f3bb3de1914dcc437f2ce33fb13f5319affbc934a739077c69b5d02e3a"
 let foundationVersion: Version = "0.1.0"
