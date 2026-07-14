@@ -3,9 +3,9 @@ import PackageDescription
 import Foundation
 
 // NOTE: swap "georgioscc" for your actual GitHub username/org if different.
-let version: Version = "0.1.0"
-let coreChecksum = "PASTE_DEMOMAINCORE_CHECKSUM_HERE"
-let uiChecksum = "PASTE_DEMOMAINUI_CHECKSUM_HERE"
+let version: Version = "0.1.1"
+let coreChecksum = "d30dd74f21017d0e536e64cc540fd4fd7a549d3643f30670b3029c1829b6ba90"
+let uiChecksum = "5444f3f3bb3de1914dcc437f2ce33fb13f5319affbc934a739077c69b5d02e3a"
 let foundationVersion: Version = "0.1.0"
 let configurationVersion: Version = "0.1.0"
 let releaseType = "releases"
