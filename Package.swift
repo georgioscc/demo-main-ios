@@ -2,9 +2,10 @@
 import PackageDescription
 import Foundation
 
+// NOTE: swap "georgioscc" for your actual GitHub username/org if different.
 let version: Version = "0.1.0"
-let coreChecksum = "d30dd74f21017d0e536e64cc540fd4fd7a549d3643f30670b3029c1829b6ba90"
-let uiChecksum = "5444f3f3bb3de1914dcc437f2ce33fb13f5319affbc934a739077c69b5d02e3a"
+let coreChecksum = "PASTE_DEMOMAINCORE_CHECKSUM_HERE"
+let uiChecksum = "PASTE_DEMOMAINUI_CHECKSUM_HERE"
 let foundationVersion: Version = "0.1.0"
 let configurationVersion: Version = "0.1.0"
 let releaseType = "releases"
@@ -15,11 +16,11 @@ let package = Package(
 	products: [
 		.library(
 			name: "DemoMainCore",
-			targets: ["DemoMainCore"]
+			targets: ["DemoMainCoreWrapper"]
 		),
 		.library(
 			name: "DemoMainUI",
-			targets: ["DemoMainUI"]
+			targets: ["DemoMainUIWrapper"]
 		),
 	],
 	dependencies: [
@@ -27,41 +28,49 @@ let package = Package(
 		.package(url: "https://github.com/georgioscc/demo-configuration-ios.git", exact: configurationVersion),
 	],
 	targets: [
+		// IMPORTANT: this name MUST match the actual framework/module name
+		// shipped inside the zip (i.e. what the local build package's target
+		// was named) — not an arbitrary label. That's why this is
+		// "DemoMainCore", not "DemoMainCoreBinary".
 		.binaryTarget(
-			name: "DemoMainCoreBinary",
+			name: "DemoMainCore",
 			url: "https://downloads.georgioscc.dev/demo-main/\(releaseType)/ios/\(version)/DemoMainCore.xcframework.zip",
 			checksum: coreChecksum
 		),
-		// Thin source-only wrapper target. Its only real job is to declare
-		// dependencies on DemoFoundation and DemoConfiguration so SwiftPM/Xcode
-		// creates the graph edges that pull both in automatically — the same
-		// technique Mapbox uses with MapboxMapsWrapper.
+		// Thin source-only wrapper target, deliberately named differently from
+		// the binary target above (naming collision otherwise). Its only real
+		// job is to declare dependencies on DemoFoundation and
+		// DemoConfiguration so SwiftPM/Xcode creates the graph edges that pull
+		// both in automatically — the same technique Mapbox uses with
+		// MapboxMapsWrapper vs. the MapboxMaps binary target.
 		.target(
-			name: "DemoMainCore",
+			name: "DemoMainCoreWrapper",
 			dependencies: [
-				"DemoMainCoreBinary",
-				.product(name: "DemoFoundation", package: "demo-foundation-ios"),
-				.product(name: "DemoConfiguration", package: "demo-configuration-ios"),
-			],
-			path: "Sources/DemoMainCore"
-		),
-		.binaryTarget(
-			name: "DemoMainUIBinary",
-			url: "https://downloads.georgioscc.dev/demo-main/\(releaseType)/ios/\(version)/DemoMainUI.xcframework.zip",
-			checksum: uiChecksum
-		),
-		// Same pattern as above, but for UI: also pulls in DemoMainCore
-		// (the wrapper target above, not the raw binary), plus Foundation and
-		// Configuration directly, matching the real UI packages' dependency shape.
-		.target(
-			name: "DemoMainUI",
-			dependencies: [
-				"DemoMainUIBinary",
 				"DemoMainCore",
 				.product(name: "DemoFoundation", package: "demo-foundation-ios"),
 				.product(name: "DemoConfiguration", package: "demo-configuration-ios"),
 			],
-			path: "Sources/DemoMainUI"
+			path: "Sources/DemoMainCoreWrapper"
+		),
+		// Same naming rule applies here: must match the shipped module name.
+		.binaryTarget(
+			name: "DemoMainUI",
+			url: "https://downloads.georgioscc.dev/demo-main/\(releaseType)/ios/\(version)/DemoMainUI.xcframework.zip",
+			checksum: uiChecksum
+		),
+		// Also pulls in DemoMainCoreWrapper (not the raw DemoMainCore binary
+		// target directly — going through the wrapper ensures Foundation/
+		// Configuration are pulled in transitively too), plus Foundation and
+		// Configuration directly, matching the real UI packages' dependency shape.
+		.target(
+			name: "DemoMainUIWrapper",
+			dependencies: [
+				"DemoMainUI",
+				"DemoMainCoreWrapper",
+				.product(name: "DemoFoundation", package: "demo-foundation-ios"),
+				.product(name: "DemoConfiguration", package: "demo-configuration-ios"),
+			],
+			path: "Sources/DemoMainUIWrapper"
 		),
 	]
 )
